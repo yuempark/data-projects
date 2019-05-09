@@ -1,4 +1,6 @@
+import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 
 def change_fig_theme(fig, ax, background_color, axis_color):
     """
@@ -34,3 +36,34 @@ def change_fig_theme(fig, ax, background_color, axis_color):
         ax[i].yaxis.label.set_color(axis_color)
         ax[i].xaxis.label.set_color(axis_color)
         ax[i].title.set_color(axis_color)
+
+def make_colormap(seq):
+    """
+    Return a LinearSegmentedColormap.
+
+    Parameters
+    ----------
+    seq : list
+        a sequence of floats and RGB-tuples. The floats should be increasing and in the interval (0,1).
+
+    Returns
+    -------
+    colormap : LinearSegmentedColormap
+
+    Example
+    -------
+    color_converter = matplotlib.colors.ColorConverter().to_rgb
+    colormap = make_colormap([color_converter('C0'), color_converter('C1'), 0.33,
+                              color_converter('C1'), color_converter('C2'), 0.66,
+                              color_converter('C3')])
+    """
+    seq = [(None,) * 3, 0.0] + list(seq) + [1.0, (None,) * 3]
+    cdict = {'red': [], 'green': [], 'blue': []}
+    for i, item in enumerate(seq):
+        if isinstance(item, float):
+            r1, g1, b1 = seq[i - 1]
+            r2, g2, b2 = seq[i + 1]
+            cdict['red'].append([item, r1, r2])
+            cdict['green'].append([item, g1, g2])
+            cdict['blue'].append([item, b1, b2])
+    return colors.LinearSegmentedColormap('CustomMap', cdict)
