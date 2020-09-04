@@ -1,5 +1,5 @@
 import pandas as pd
-pd.set_option('display.max_columns', 500)
+pd.set_option('display.max_columns', 999)
 import numpy as np
 
 all_data = pd.read_csv('../../data/2020_LoL_esports_match_data_from_OraclesElixir_20200904.csv')
