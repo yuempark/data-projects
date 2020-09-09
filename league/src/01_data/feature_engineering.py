@@ -109,3 +109,40 @@ for i in range(len(picks)):
 ax[0][0].set_xlim(0,1)
 ax[0][0].legend()
 plt.show(fig)
+
+# split X and Y
+y = prematch_data['blue_win'].copy()
+x = prematch_data.drop(columns=['gameid','blue_win']).copy()
+
+# target encode the categorical features
+def target_encode(col, weight=None):
+    total_mean = np.mean(y)
+    cats = x[col].unique()
+    if weight==None:
+        weight = int((len(x)/len(cats))/2)
+    for cat in cats:
+        if pd.isnull(cat):
+            if len(x[x[col].isna()])==0:
+                x[col].fillna(total_mean, inplace=True)
+            else:
+                cat_mean = np.mean(y[x[col].isna()])
+                count = len(x[x[col].isna()])
+                x.loc[x[col].isna(), col] = (count*cat_mean + weight*total_mean)/(count+weight)
+        else:
+            if len(x[x[col]==cat])==0:
+                x.loc[x[col]==cat, col] = total_mean
+            else:
+                cat_mean = np.mean(y[x[col]==cat])
+                count = len(x[x[col]==cat])
+                x.loc[x[col]==cat, col] = (count*cat_mean + weight*total_mean)/(count+weight)
+                
+TE_features = ['league','split','blue_team','red_team',
+               'blue_ban1','blue_ban2','blue_ban3','blue_ban4','blue_ban5',
+               'red_ban1','red_ban2','red_ban3','red_ban4','red_ban5',
+               'blue_pick1','blue_pick2','blue_pick3','blue_pick4','blue_pick5',
+               'red_pick1','red_pick2','red_pick3','red_pick4','red_pick5']
+for col in TE_features:
+    target_encode(col)
+    
+x.to_csv('../../data/02_x.csv', index=False)
+y.to_csv('../../data/03_y.csv', index=False)
