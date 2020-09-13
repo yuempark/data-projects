@@ -84,4 +84,8 @@ print(GBC_RSCV.best_estimator_)
 
 # the best performing classifier
 best_GBC = GBC_RSCV.best_estimator_
-joblib.dump(best_GBC, 'best_GBC.pkl') 
+joblib.dump(best_GBC, 'best_GBC.pkl')
+
+# classifier fitted on the entire training set
+fitted_best_GBC = best_GBC.fit(x.values, y.values)
+joblib.dump(fitted_best_GBC, 'fitted_best_GBC.pkl')
