@@ -79,3 +79,20 @@ ax.set_xlabel('predicted blue win probability')
 ax.legend()
 fig.savefig('../../visualizations/prediction-histograms.jpg', bbox_inches='tight', dpi=300)
 plt.show()
+
+# feature importances
+features = x.columns
+feature_importances = best_GBC.feature_importances_
+sort_ind = np.argsort(feature_importances)[::-1]
+features = features[sort_ind]
+feature_importances = feature_importances[sort_ind]
+
+fig, ax = plt.subplots(figsize=(10,4))
+n_top_features = len(feature_importances)
+x_inds = np.arange(n_top_features)
+ax.bar(x_inds, feature_importances[:n_top_features])
+ax.set_xticks(x_inds)
+ax.set_xticklabels(features[:n_top_features], rotation=270)
+ax.set_ylabel('feature importance')
+fig.savefig('../../visualizations/feature-importances.jpg', bbox_inches='tight', dpi=300)
+plt.show(fig)
