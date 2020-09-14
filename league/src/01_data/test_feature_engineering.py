@@ -47,6 +47,7 @@ for pick in picks:
         
         # if it isn't use the latest patch in the training data
         else:
+            print('patch {} not in training data.'.format(patch))
             train_patch = np.max(prematch_data['patch'].unique())
             prematch_data_patch_slice = prematch_data[prematch_data['patch']==train_patch]
             x_patch_slice = x[x['patch']==train_patch]
@@ -87,13 +88,23 @@ for pick in picks:
         prematch_test_data.loc[prematch_test_data['patch']==patch, 'red_pick'+pick+'_ban_rate'] = red_pick_ban_rate
         
 # copy values for the target encoded features
+missing_category = []
+missing_feature = []
+missing_patch = []
+prematch_test_data['missing'] = np.zeros(len(prematch_test_data), dtype=int)
+
+
 for feature in TE_features:
+    
+    feature_missing_category = []
+    feature_missing_feature = []
     
     for patch in unique_patch:
             
         prematch_test_data_patch_slice = prematch_test_data[prematch_test_data['patch']==patch]
         total_patch_games = len(prematch_test_data_patch_slice)
         encode_vals = np.zeros(total_patch_games)
+        missing_flag = np.zeros(total_patch_games, dtype=int)
         
         # if the patch is in the training data
         if patch in prematch_data['patch'].values:
@@ -120,13 +131,28 @@ for feature in TE_features:
                 
             # otherwise use the mean value
             else:
+                if category not in feature_missing_category:
+                    feature_missing_category.append(category)
+                    feature_missing_feature.append(feature)
+                    missing_patch.append(patch)
                 encode_vals[i] = np.mean(x_patch_slice[feature])
+                missing_flag[i] = 1
                 
+        # replace values, and also flag rows with values that don't appear in the training data
         prematch_test_data.loc[prematch_test_data['patch']==patch, feature] = encode_vals
+        prematch_test_data.loc[prematch_test_data['patch']==patch, 'missing'] = missing_flag|prematch_test_data['missing']
+        missing_category = missing_category + feature_missing_category
+        missing_feature = missing_feature + feature_missing_feature
         
+# show what's missing
+for i in range(len(missing_category)):
+    print('{} not in {} : patch {}'.format(missing_category[i], missing_feature[i], missing_patch[i]))
+
 # split X and Y
 test_y = prematch_test_data['blue_win'].copy()
+test_x_missing = prematch_test_data['missing'].copy()
 test_x = prematch_test_data[x.columns].copy()
 
 test_x.to_csv('../../data/06_test_x.csv', index=False)
 test_y.to_csv('../../data/07_test_y.csv', index=False)
+test_x.to_csv('../../data/08_test_x_missing.csv', index=False)
