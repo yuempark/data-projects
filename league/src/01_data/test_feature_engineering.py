@@ -155,4 +155,4 @@ test_x = prematch_test_data[x.columns].copy()
 
 test_x.to_csv('../../data/06_test_x.csv', index=False)
 test_y.to_csv('../../data/07_test_y.csv', index=False)
-test_x.to_csv('../../data/08_test_x_missing.csv', index=False)
+test_x_missing.to_csv('../../data/08_test_x_missing.csv', index=False)
