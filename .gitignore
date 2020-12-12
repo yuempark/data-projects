@@ -1,8 +1,9 @@
 ## sensitive data
 sensitive-data/
 
-# mac stuff
+# other stuff
 .DS_Store
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
